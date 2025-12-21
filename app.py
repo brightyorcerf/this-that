@@ -1,57 +1,107 @@
 from cs50 import SQL
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from helpers import updateElo
+import secrets
+import random
 
 app = Flask(__name__)
-app.config ["TEMPLATES_AUTO_RELOAD"] = True
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.secret_key = secrets.token_hex(16)  # For flash messages
 
 db = SQL("sqlite:///database.db")
 
-MAX_ID = db.execute("SELECT COUNT(id) as counter from girls")[0]["counter"] 
+def get_max_id():
+    """Get the maximum ID from the database"""
+    result = db.execute("SELECT COUNT(id) as counter FROM girls")
+    return result[0]["counter"] if result else 0
 
-# on load redirect to battle 
-@app.route("/", methods = ["GET", "POST"])
+def generate_random_pair(max_id):
+    """Generate two different random IDs"""
+    if max_id < 2:
+        return None, None
+    
+    id1 = random.randint(1, max_id)
+    id2 = random.randint(1, max_id)
+    
+    while id1 == id2:
+        id2 = random.randint(1, max_id)
+    
+    return id1, id2
+
+@app.route("/", methods=["GET", "POST"])
 def battle():
-
-    girls = db.execute("SELECT id, elo FROM girls ORDER BY elo DESC")
-
-    # generate IDs
+    MAX_ID = get_max_id()
+    
+    # Get TOP 3 leaderboard data only
+    girls = db.execute("SELECT id, filename, elo FROM girls ORDER BY elo DESC LIMIT 3")
+    
     if request.method == "GET":
-        girl1 = {"id": 0, "name": "emma", "elo": None}
-        girl2 = {"id": 0, "name": "anne", "elo": None}
+        # Auto-generate a random pair on initial load
+        id1, id2 = generate_random_pair(MAX_ID)
+        
+        if id1 and id2:
+            girl1 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", id1)[0]
+            girl2 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", id2)[0]
+        else:
+            # Fallback if not enough images
+            girl1 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
+            girl2 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
+        
         return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
-
-    else:
-        #if generation request 
-        if request.form.get("id1") != None and request.form.get("id2") != None:
+    
+    else:  # POST request
+        # Handle pair generation request
+        if request.form.get("id1") and request.form.get("id2"):
             id1 = request.form.get("id1")
             id2 = request.form.get("id2")
-
-            # validation step 
-            if not id1 in [str(x) for x in range(1, MAX_ID + 1)] or not id2 in [str(x) for x in range(1, MAX_ID+1)] or id1 == id2:
+            
+            # Validation
+            valid_ids = [str(x) for x in range(1, MAX_ID + 1)]
+            if id1 not in valid_ids or id2 not in valid_ids or id1 == id2:
+                flash("Invalid image IDs selected", "error")
                 return redirect("/")
-
-            girl1 = db.execute("SELECT id, elo FROM girls WHERE id = ?", int(id1))[0]
-            girl2 = db.execute("SELECT id, elo FROM girls WHERE id = ?", int(id2))[0]     
-
-            return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)  
-
-        # if elo change req
-        elif  request.form.get("winner") != None and request.form.get("loser") != None:
-
-            winnerId = request.form.get("winner")
-            loserId = request.form.get("loser")
-
-            if not winnerId in [str(x) for x in range(1, MAX_ID + 1)] or not loserId in [str(x) for x in range(1, MAX_ID+1)] or winnerId == loserId:
-                    return redirect("/")
-
-            updateElo(winnerId, loserId, db) # update elo 
-
-            return redirect("/") # generate new IDs
-
+            
+            # Fetch girls with filename
+            girl1 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", int(id1))[0]
+            girl2 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", int(id2))[0]
+            
+            return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
+        
+        # Handle vote submission - AUTO-GENERATE NEXT PAIR
+        elif request.form.get("winner") and request.form.get("loser"):
+            winner_id = request.form.get("winner")
+            loser_id = request.form.get("loser")
+            
+            # Validation
+            valid_ids = [str(x) for x in range(1, MAX_ID + 1)]
+            if winner_id not in valid_ids or loser_id not in valid_ids or winner_id == loser_id:
+                flash("Invalid vote submission", "error")
+                return redirect("/")
+            
+            # Update ELO ratings
+            try:
+                updateElo(winner_id, loser_id, db)
+            except Exception as e:
+                flash(f"Error recording vote: {str(e)}", "error")
+                return redirect("/")
+            
+            # AUTO-GENERATE NEXT PAIR instead of redirecting
+            id1, id2 = generate_random_pair(MAX_ID)
+            
+            if id1 and id2:
+                girl1 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", id1)[0]
+                girl2 = db.execute("SELECT id, filename, elo FROM girls WHERE id = ?", id2)[0]
+                
+                # Refresh leaderboard (in case top 3 changed)
+                girls = db.execute("SELECT id, filename, elo FROM girls ORDER BY elo DESC LIMIT 3")
+                
+                return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
+            else:
+                return redirect("/")
+        
         else:
-            #generate new IDs
+            # Invalid POST request
             return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)    
+    app.run(debug=True)
