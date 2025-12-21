@@ -91,7 +91,7 @@ Where:
 - `Expected_Score` = Calculated probability from formula above
 
 
-## 📸 Adding Images
+## Adding Images
 
 1. Place any `.jpg`, `.png`, `.gif`, or `.webp` files in `static/images/`
 2. Run `python seed_database.py` to add them to the database 
