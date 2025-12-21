@@ -1,9 +1,11 @@
-![website image](demo.jpg?raw=true "Title")
+![website image](demo.jpg)
 
-This > That: ELO-Based Image Ranking System
-📋 Project Overview
-This-That is a web application that ranks images using the ELO rating system (the same system used in chess). Users are presented with two random images and choose which one they prefer. Over time, the system learns which images are most popular based on head-to-head comparisons.
-Key Features
+This > That: inspired from "the social network"
+
+This-That is a web application that ranks images using the ELO rating system in a battle-style.
+It's a simple version of another project I'm creating.
+
+Key Features:
 
 Pairwise Comparison: Users vote by clicking their preferred image
 ELO Rating System: Mathematical algorithm that updates ratings based on wins/losses
