@@ -1,20 +1,20 @@
 # This > That
 
-![Demo](__demo.jpg__)
+![Demo](demo.jpg)
 
 > *Inspiration from "The Social Network"*
 
-**This-That** is a web application that ranks images using the ELO rating system in a battle-style format. It's a simpler version of another project I'm creating.
+This > That is a web application that ranks images using the ELO rating system in a battle-style format. It's a simpler version of another project I'm creating.
 
 ---
 
 ## 🚀 Key Features
 
-- **Pairwise Comparison**: Simple "point-and-click" voting interface
-- **ELO Rating System**: Mathematical algorithm that updates image rankings dynamically based on wins/losses
-- **Live Leaderboard**: Real-time, sortable ranking of all images
-- **Random Matchmaking**: Logic to ensure unbiased pairs are generated for every round
-- **Responsive Design**: Fully optimized for both desktop and mobile using Bootstrap 5
+- Pairwise Comparison: Simple "point-and-click" voting interface
+- ELO Rating System: Mathematical algorithm that updates image rankings dynamically based on wins/losses
+- Live Leaderboard: Real-time, sortable ranking of all images
+- Random Matchmaking: Logic to ensure unbiased pairs are generated for every round
+- Responsive Design: Fully optimized for both desktop and mobile using Bootstrap 5
 
 ---
 
