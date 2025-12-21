@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}Which One?{% endblock %}
+
+{% block body %}
+<div class="container text-center mt-4">
+  <h1>Which One?</h1>
+
+  <div class="row mt-4">
+    <div class="col">
+      <img
+        class="img-fluid choice-img"
+        src="{{ url_for('static', filename='images/' ~ girl1.filename) }}"
+        alt="choice 1"
+        onclick="sendWinner({{ girl1.id }}, {{ girl2.id }})"
+      >
+      <p class="mt-2">Rating: {{ girl1.elo }}</p>
+    </div>
+
+    <div class="col">
+      <img
+        class="img-fluid choice-img"
+        src="{{ url_for('static', filename='images/' ~ girl2.filename) }}"
+        alt="choice 2"
+        onclick="sendWinner({{ girl2.id }}, {{ girl1.id }})"
+      >
+      <p class="mt-2">Rating: {{ girl2.elo }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <h3>Leaderboard</h3>
+  <table id="leaderboard" class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>ELO</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for girl in girls %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ girl.elo }}</td>
+        <td>
+          <img
+            class="leaderboard-img"
+            src="{{ url_for('static', filename='images/' ~ girl.filename) }}"
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $('#leaderboard').DataTable();
+  });
+</script>
+{% endblock %}
