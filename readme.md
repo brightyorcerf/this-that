@@ -1,4 +1,6 @@
-This-That: ELO-Based Image Ranking System
+![website image](demo.jpg?raw=true "Title")
+
+This > That: ELO-Based Image Ranking System
 📋 Project Overview
 This-That is a web application that ranks images using the ELO rating system (the same system used in chess). Users are presented with two random images and choose which one they prefer. Over time, the system learns which images are most popular based on head-to-head comparisons.
 Key Features
@@ -42,5 +44,6 @@ this-that/
 
 
 how to run 
+conda activate base
 python seed_database.py
 python app.py
