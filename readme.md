@@ -8,7 +8,7 @@ This > That is a web application that ranks images using the ELO rating system i
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 - Pairwise Comparison: Simple "point-and-click" voting interface
 - ELO Rating System: Mathematical algorithm that updates image rankings dynamically based on wins/losses
@@ -18,7 +18,7 @@ This > That is a web application that ranks images using the ELO rating system i
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
 User clicks image → JavaScript submits form → Flask processes vote → 
@@ -34,7 +34,7 @@ Database updates ELO → Renders next pair automatically
 
 ---
 
-## 📁 File Structure & Purpose
+## File Structure 
 
 ```
 this-that/
@@ -58,14 +58,13 @@ this-that/
 
 ---
 
-## 🎮 How to Run
+## How to Run
 
 ```bash 
 conda activate base 
 python seed_database.py 
 python app.py 
-
----
+```
 
 ## 🧮 The Logic
 
@@ -95,7 +94,6 @@ Where:
 ## 📸 Adding Images
 
 1. Place any `.jpg`, `.png`, `.gif`, or `.webp` files in `static/images/`
-2. Run `python seed_database.py` to add them to the database
-3. Images can have any filename (no restrictions)
+2. Run `python seed_database.py` to add them to the database 
 
 ---
