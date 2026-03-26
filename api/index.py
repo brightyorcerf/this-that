@@ -6,14 +6,15 @@ from helpers import updateElo
 import secrets
 import random
 
-app = Flask(__name__)
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-# Fallback to local hex if not defined to prevent crashing
+app = Flask(__name__, 
+            template_folder="../templates", 
+            static_folder="../static")
+
+app.config["TEMPLATES_AUTO_RELOAD"] = True 
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(16))
 
 def get_db_connection():
-    """ Establish stateless Postgres Connection via Env Var """
-    # Uses DATABASE_URL (e.g., postgres://user:password@hostname:5432/dbname)
+    """ Establish stateless Postgres Connection via Env Var """ 
     conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
     return conn
 
