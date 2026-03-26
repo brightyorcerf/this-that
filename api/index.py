@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, jsonify
 from .helpers import updateElo
 import secrets
 import random
@@ -83,27 +83,28 @@ def battle():
         return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
         
     else:  # POST request
+        # Parse JSON if available, otherwise fallback to form
+        data = request.get_json(silent=True) or request.form
+        
         # Handle explicit pair ID requests conditionally passed inside the application 
-        if request.form.get("id1") and request.form.get("id2"):
-            id1 = request.form.get("id1")
-            id2 = request.form.get("id2")
+        if data.get("id1") and data.get("id2"):
+            id1 = data.get("id1")
+            id2 = data.get("id2")
             
             # Security Audit: Stringent parsing over Python List Inclusion. Stops injection arrays natively
             try:
                 id1 = int(id1)
                 id2 = int(id2)
             except ValueError:
-                flash("Invalid image IDs selected: Must be integers", "error")
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": "Invalid image IDs selected: Must be integers"}), 400
             
             # Additional logical checks
             if id1 == id2 or id1 <= 0 or id2 <= 0:
-                flash("Invalid image IDs selected: IDs must be different and positive", "error")
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": "Invalid image IDs selected: IDs must be different and positive"}), 400
                 
             cur.execute("SELECT id, filename, elo FROM girls WHERE id = %s", (id1,))
             girl1 = cur.fetchone()
@@ -114,31 +115,32 @@ def battle():
             conn.close()
             
             if not girl1 or not girl2:
-                flash("Image IDs not found in database", "error")
-                return redirect("/")
+                return jsonify({"error": "Image IDs not found in database"}), 404
                 
-            return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
+            return jsonify({
+                "girl1": girl1,
+                "girl2": girl2,
+                "leaderboard": girls
+            })
             
         # Standard Voting Path route
-        elif request.form.get("winner") and request.form.get("loser"):
-            winner_id = request.form.get("winner")
-            loser_id = request.form.get("loser")
+        elif data.get("winner") and data.get("loser"):
+            winner_id = data.get("winner")
+            loser_id = data.get("loser")
             
             # Security Audit Validation: Ensure they are parseable, unique integers!
             try:
                 winner_id = int(winner_id)
                 loser_id = int(loser_id)
             except ValueError:
-                flash("Invalid vote format: IDs must be integer", "error")
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": "Invalid vote format: IDs must be integer"}), 400
             
             if winner_id == loser_id or winner_id <= 0 or loser_id <= 0:
-                flash("Invalid vote submission: self-votes not allowed", "error")
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": "Invalid vote submission: self-votes not allowed"}), 400
                 
             try:
                 # Actual_Score is strictly passed internally as 1 (winner) and 0 (loser) 
@@ -147,10 +149,9 @@ def battle():
                 conn.commit()
             except Exception as e:
                 conn.rollback() # Ensure transaction closes properly to avoid locks!
-                flash(f"Error recording vote: {str(e)}", "error")
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": f"Error recording vote: {str(e)}"}), 500
                 
             # AUTO-GENERATE NEXT PAIR
             girl1, girl2 = generate_random_pair(cur)
@@ -159,16 +160,20 @@ def battle():
                 girls = cur.fetchall()
                 cur.close()
                 conn.close()
-                return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
+                return jsonify({
+                    "girl1": girl1,
+                    "girl2": girl2,
+                    "leaderboard": girls
+                })
             else:
                 cur.close()
                 conn.close()
-                return redirect("/")
+                return jsonify({"error": "Failed to generate next pair"}), 500
                 
         else:
             cur.close()
             conn.close()
-            return redirect("/")
+            return jsonify({"error": "Invalid request parameters"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)

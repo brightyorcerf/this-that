@@ -14,7 +14,9 @@ body {
 }
 
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     color: #f8f0fb;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -225,30 +227,54 @@ h3 {
     color: #999;
 }
 
-/* === RESPONSIVE === */
 @media (max-width: 768px) {
+    .row.mt-4 {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .choice-img {
+        height: 350px;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .choice-container {
+        width: 100%;
+        max-width: 450px;
+        margin-bottom: 20px;
+    }
+
     h1 {
         font-size: 2rem;
     }
-    
+
     .choice-img {
         height: 300px;
     }
-    
+
     .placeholder-box {
         min-height: 300px;
     }
-    
+
     .btn-primary {
         padding: 12px 30px;
         font-size: 1rem;
     }
-    
+
     .leaderboard-img {
         width: 70px;
         height: 70px;
     }
-    
+
     #leaderboard thead th,
     #leaderboard tbody td {
         padding: 10px 5px;
@@ -260,7 +286,7 @@ h3 {
     .choice-img {
         height: 250px;
     }
-    
+
     .leaderboard-img {
         width: 50px;
         height: 50px;
@@ -268,16 +294,16 @@ h3 {
 }
 
 #colorCorrect {
-  color: #1a202c;  
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  font-family: sans-serif;
+    color: #1a202c;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-family: sans-serif;
 }
 
 #heading {
-  color: #7c3aed; 
-  background-color: #f5f3ff; 
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
+    color: #7c3aed;
+    background-color: #f5f3ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
 }
