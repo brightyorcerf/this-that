@@ -307,3 +307,18 @@ h3 {
     border-radius: 4px;
     font-weight: bold;
 }
+
+.loading-active {
+    filter: blur(2px) grayscale(50%);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+#loader {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
