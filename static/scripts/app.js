@@ -27,7 +27,7 @@ async function handleVote(side) {
 
     if (response.ok) {
         const data = await response.json();
-        
+
         if (data.error) {
             alert(data.error);
             return;
@@ -52,15 +52,17 @@ async function handleVote(side) {
 }
 
 async function generateNewPair(maxId) {
-    if (!maxId || maxId < 2) {
+    const btn = document.getElementById('generate-btn');
+    const currentMax = btn.getAttribute('data-max');
+    if (!currentMax || currentMax < 2) {
         console.warn("Not enough items to generate a match");
         return;
     }
 
-    let id1 = Math.floor(Math.random() * maxId) + 1;
+    let id1 = Math.floor(Math.random() * currentMax) + 1;
     let id2;
     do {
-        id2 = Math.floor(Math.random() * maxId) + 1;
+        id2 = Math.floor(Math.random() * currentMax) + 1;
     } while (id1 === id2);
 
     const response = await fetch('/', {

@@ -19,11 +19,9 @@
     {% endwith %}
 
     <!-- Generate button -->
-    <div class="mb-3">
-        <button id="generate-btn" class="btn btn-primary btn-lg" onclick="generateNewPair({{ MAX_ID }})">
-            Generate Random Pair
-        </button>
-    </div>
+    <button id="generate-btn" class="btn btn-primary btn-lg" data-max="{{ MAX_ID }}" onclick="generateNewPair()">
+        Generate Random Pair
+    </button>
 
     <!-- Battle images -->
     <div class="row mt-4">
@@ -32,8 +30,7 @@
             <div class="choice-container">
                 <img id="girl1-img" class="img-fluid choice-img"
                     src="{{ url_for('static', filename='images/' ~ girl1.filename) }}" alt="Choice 1"
-                    data-id="{{ girl1.id }}"
-                    onclick="handleVote('left')">
+                    data-id="{{ girl1.id }}" onclick="handleVote('left')">
                 <p class="mt-2 fs-5"><strong>Rating:</strong> <span id="rating-1">{{ girl1.elo }}</span></p>
             </div>
             {% else %}
@@ -48,8 +45,7 @@
             <div class="choice-container">
                 <img id="girl2-img" class="img-fluid choice-img"
                     src="{{ url_for('static', filename='images/' ~ girl2.filename) }}" alt="Choice 2"
-                    data-id="{{ girl2.id }}"
-                    onclick="handleVote('right')">
+                    data-id="{{ girl2.id }}" onclick="handleVote('right')">
                 <p class="mt-2 fs-5"><strong>Rating:</strong> <span id="rating-2">{{ girl2.elo }}</span></p>
             </div>
             {% else %}
