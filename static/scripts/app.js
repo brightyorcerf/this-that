@@ -1,5 +1,5 @@
 $(function () {
-    if ($('#leaderboard').length) {
+    if ($('#leaderboard').length && !$.fn.DataTable.isDataTable('#leaderboard')) {
         $('#leaderboard').DataTable({
             paging: false,
             info: false,
@@ -76,6 +76,7 @@ async function generateNewPair() {
     }
 }
 
+// SHARED UI UPDATE LOGIC
 function updateUI(data) {
     const { girl1, girl2, leaderboard } = data;
     const g1 = document.getElementById('girl1-img');
@@ -97,8 +98,8 @@ function updateUI(data) {
 }
 
 function updateLeaderboard(leaderboard) {
-    const table = $('#leaderboard').DataTable();
-    if (table) {
+    if ($.fn.DataTable.isDataTable('#leaderboard')) {
+        const table = $('#leaderboard').DataTable();
         table.clear();
         leaderboard.forEach((girl, index) => {
             table.row.add([
