@@ -1,7 +1,7 @@
 import psycopg2
 import os
  
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:[YOUR-PASSWORD]@db.mtbsgadocmnhjxxdnmdj.supabase.co:5432/postgres")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:lokedin$$@db.mtbsgadocmnhjxxdnmdj.supabase.co:5432/postgres")
 
 def seed_to_supabase():
     IMAGE_DIR = "static/images"
