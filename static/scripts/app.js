@@ -24,10 +24,15 @@ async function handleVote(side) {
     const loser = (side === 'left') ? id2 : id1;
 
     try {
+        // Enforce safe primitive strings mapped effectively to form encoding params
+        const bodyStr = new URLSearchParams({ winner: String(winner), loser: String(loser) }).toString();
+        
+        console.log(`Sending vote: WINNER=${winner}, LOSER=${loser}`);
+
         const response = await fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ winner, loser })
+            body: bodyStr
         });
 
         if (response.ok) {
@@ -55,7 +60,11 @@ async function generateNewPair() {
     const btn = document.getElementById('generate-btn');
     const currentMax = btn.getAttribute('data-max');
 
-    if (!currentMax || currentMax < 2) return;
+    if (!currentMax || currentMax < 2) {
+        console.error("Not enough images! Max ID:", currentMax);
+        alert("Not enough data to generate pair! Make sure DB is synced.");
+        return;
+    }
 
     battleRow.classList.add('loading-active');
 
@@ -63,11 +72,14 @@ async function generateNewPair() {
     let id2;
     do { id2 = Math.floor(Math.random() * currentMax) + 1; } while (id1 === id2);
 
+    console.log(`Requesting random pair generation: ID_1=${id1}, ID_2=${id2}`);
+
     try {
+        const bodyStr = new URLSearchParams({ id1: String(id1), id2: String(id2) }).toString();
         const response = await fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ id1, id2 })
+            body: bodyStr
         });
 
         if (response.ok) {
@@ -93,10 +105,31 @@ async function generateNewPair() {
 // SHARED UI UPDATE LOGIC
 function updateUI(data) {
     const { girl1, girl2, leaderboard } = data;
-    const g1 = document.getElementById('girl1-img');
-    const g2 = document.getElementById('girl2-img');
+    let g1 = document.getElementById('girl1-img');
+    let g2 = document.getElementById('girl2-img');
 
-    if (g1 && g2) {
+    // Handle initialization when starting from pure 'placeholder' text
+    if (!g1 || !g2) {
+        const row = document.getElementById('battle-row');
+        if (row && row.children.length >= 2) {
+            row.children[0].innerHTML = `
+                <div class="choice-container">
+                    <img id="girl1-img" class="img-fluid choice-img" src="/static/images/${girl1.filename}" alt="Choice 1" data-id="${girl1.id}" onclick="handleVote('left')">
+                    <p class="mt-2 fs-5"><strong>Rating:</strong> <span id="rating-1">${girl1.elo}</span></p>
+                </div>
+            `;
+            row.children[1].innerHTML = `
+                <div class="choice-container">
+                    <img id="girl2-img" class="img-fluid choice-img" src="/static/images/${girl2.filename}" alt="Choice 2" data-id="${girl2.id}" onclick="handleVote('right')">
+                    <p class="mt-2 fs-5"><strong>Rating:</strong> <span id="rating-2">${girl2.elo}</span></p>
+                </div>
+            `;
+            g1 = document.getElementById('girl1-img');
+            g2 = document.getElementById('girl2-img');
+        }
+    }
+
+    if (g1 && g2 && girl1 && girl2) {
         g1.src = `/static/images/${girl1.filename}`;
         g2.src = `/static/images/${girl2.filename}`;
         g1.setAttribute('data-id', girl1.id);

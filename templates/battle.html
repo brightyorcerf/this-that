@@ -90,6 +90,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='scripts/scripts.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/app.js') }}?v={{ range(1, 10000000) | random }}"></script>
 {% endblock %}
