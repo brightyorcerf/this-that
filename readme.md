@@ -1,5 +1,7 @@
 # This > That
 
+https://disdat.vercel.app
+
 ![Demo](demo.jpg)
 
 > *Inspiration from "The Social Network"*
@@ -21,16 +23,16 @@ This > That is a web application that ranks images using the ELO rating system i
 ## Architecture Overview
 
 ```
-User clicks image → JavaScript submits form → Flask processes vote → 
-Database updates ELO → Renders next pair automatically
+User clicks image → JavaScript Fetch API → api/index.py (Serverless) → 
+Supabase (PostgreSQL) updates ELO → JSON returned → UI updated via DOM manipulation
 ```
 
 ### Technology Stack
 
-- **Backend**: Python + Flask (web framework)
-- **Database**: SQLite (via CS50 library)
-- **Frontend**: HTML, CSS, JavaScript, Bootstrap 5
-- **Data Tables**: jQuery DataTables (sortable leaderboard)
+- Backend: Python + Flask (web framework) (deployed as vercel serverless functions)
+- Database: PostgreSQL (hosted via supabase)
+- Frontend: HTML, CSS, JavaScript, Bootstrap 5, jQuery DataTables
+- Architecture: SPA (single page application) feel using AJAX/Fetch API for zero-reload voting.
 
 ---
 
@@ -38,33 +40,19 @@ Database updates ELO → Renders next pair automatically
 
 ```
 this-that/
-├── app.py                    # Main Flask application (routing & logic)
-├── helpers.py                # ELO calculation functions
-├── seed_database.py          # Database setup script
-├── database.db               # SQLite database (created by seed script)
-│
-├── static/                   # Static assets (CSS, JS, images)
-│   ├── images/              # Your image files (jpg, png, etc.)
-│   ├── scripts/
-│   │   ├── app.js           # DataTables initialization
-│   │   └── scripts.js       # Vote submission & pair generation
-│   └── styles/
-│       └── styles.css       # Custom styling
-│
-└── templates/               # HTML templates (Jinja2)
-    ├── layout.html          # Base template (navbar, scripts)
-    └── battle.html          # Main voting interface
+├── api/
+│   ├── index.py          # Main Serverless entry point
+│   └── helpers.py        # ELO & DB utility logic
+├── static/
+│   ├── images/           # Asset storage
+│   ├── scripts/          # app.js (AJAX logic)
+│   └── styles/           # Custom CSS
+├── templates/            # Jinja2 HTML templates
+├── seedSupabase.py       # Cloud DB setup script
+└── vercel.json           # Deployment configuration
 ```
 
----
-
-## How to Run
-
-```bash 
-conda activate base 
-python seed_database.py 
-python app.py 
-```
+--- 
 
 ## 🧮 The Logic
 
@@ -94,6 +82,6 @@ Where:
 ## Adding Images
 
 1. Place any `.jpg`, `.png`, `.gif`, or `.webp` files in `static/images/`
-2. Run `python seed_database.py` to add them to the database 
+2. Run `python seedSupabase.py` to add them to the database 
 
 ---

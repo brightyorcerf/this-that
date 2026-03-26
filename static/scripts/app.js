@@ -51,7 +51,7 @@ async function handleVote(side) {
     }
 }
 
-async function generateNewPair(maxId) {
+async function generateNewPair() {
     const btn = document.getElementById('generate-btn');
     const currentMax = btn.getAttribute('data-max');
     if (!currentMax || currentMax < 2) {
