@@ -309,16 +309,33 @@ h3 {
 }
 
 .loading-active {
-    filter: blur(2px) grayscale(50%);
+    opacity: 0.7;
     pointer-events: none;
-    transition: all 0.3s ease;
+    cursor: wait;
 }
 
-#loader {
+/* Add a sleek progress bar at the top of the container */
+#voting-progress {
     display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
+    height: 4px;
+    width: 100%;
+    background-color: #8B0200;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: loading-bar 2s infinite;
+}
+
+@keyframes loading-bar {
+    0% {
+        width: 0%;
+    }
+
+    50% {
+        width: 70%;
+    }
+
+    100% {
+        width: 100%;
+    }
 }
