@@ -1,16 +1,19 @@
 import psycopg2
-import os
- 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:lokedin$$@db.mtbsgadocmnhjxxdnmdj.supabase.co:5432/postgres")
+import os 
+RAW_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:Ei4IvmIAjsU5lXra@db.mtbsgadocmnhjxxdnmdj.supabase.co:5432/postgres")
+
+if "?" in RAW_URL:
+    DATABASE_URL = RAW_URL 
+else:
+    DATABASE_URL = f"{RAW_URL}?sslmode=require"
 
 def seed_to_supabase():
-    IMAGE_DIR = "static/images"
+    IMAGE_DIR = "static/images" 
+    print(f"Connecting to: {DATABASE_URL.split('@')[1]}")
     
     try:
         conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-        
-        # Create Table Structure Intelligently 
+        cur = conn.cursor() 
         cur.execute("""
             CREATE TABLE IF NOT EXISTS girls (
                 id SERIAL PRIMARY KEY,
