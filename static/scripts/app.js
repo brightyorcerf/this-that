@@ -37,9 +37,14 @@ async function handleVote(side) {
             } else {
                 updateUI(data);
             }
+        } else {
+            const errorMsg = await response.text();
+            alert("Server Error: " + errorMsg);
+            console.error("Non-200 Response:", errorMsg);
         }
     } catch (error) {
         console.error("Failed to submit vote:", error);
+        alert("Network Error: Could not connect to server.");
     } finally {
         battleRow.classList.remove('loading-active');
     }
@@ -67,10 +72,19 @@ async function generateNewPair() {
 
         if (response.ok) {
             const data = await response.json();
-            updateUI(data);
+            if (data.error) {
+                alert(data.error);
+            } else {
+                updateUI(data);
+            }
+        } else {
+            const errorMsg = await response.text();
+            alert("Server Error: " + errorMsg);
+            console.error("Non-200 Response:", errorMsg);
         }
     } catch (err) {
         console.error("Fetch error:", err);
+        alert("Network Error: Could not connect to server.");
     } finally {
         battleRow.classList.remove('loading-active');
     }
