@@ -80,7 +80,7 @@ h3 {
     transition: all 0.3s ease;
     filter: grayscale(20%) contrast(110%);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.7);
-    background-color: #1a1a1a;
+    background-color: #FFFFFF;
 }
 
 .choice-img:hover {
@@ -240,7 +240,7 @@ h3 {
         height: auto;
         margin: 0 auto;
         object-fit: contain;
-        background-color: transparent;
+        background-color: #FFFFFF;
     }
 
     .choice-container {
