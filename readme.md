@@ -64,10 +64,11 @@ Where:
 To keep the LCP (Largest Contentful Paint) under 1 second, I built a custom Python/Pillow pipeline to batch-convert raw JPEGs into high-compression WebP assets. Result: Reduced average asset size from 1.5MB to ~25KB (a 98% reduction!) without noticeable quality loss.
 
 Atomic vs. Race Conditions: I realized that if two people vote at the exact same millisecond, the database might get confused. I learnt to use Atomic SQL updates (votes = votes + 1) to ensure every single click is registered perfectly.
-
-One of my biggest goals was to eliminate the "Flash of White" (page reloads) every time a user votes. 
-- The Seamless Swap: I implemented the Fetch API to handle all voting logic in the background. When you click an image, the vote travels to the server, the ELO is calculated, and the next pair is "injected" into the page without the browser ever refreshing.
-- State Management: By using JSON as our "Messenger," I was able to update the Live Leaderboard, the Global Vote Counter, and the Battle Images all in a single asynchronous round-trip. 
+ 
+How I slashed latency from 10s to ~150ms:
+- The Seamless Swap (AJAX/Fetch): Replaced clunky page reloads with a decoupled architecture. Using the Fetch API, votes are processed in the background, injecting new pairs instantly without a "flash of white."
+- Fast-Path Execution: Re-engineered the backend to pre-calculate the next pair of images before the database finished saving the previous result.
+- Optimistic UI: Programmed the frontend to update the moment a user clicks, effectively "hiding" the transcontinental lag.
 
 ## Adding Images
 

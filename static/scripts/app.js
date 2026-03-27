@@ -32,7 +32,7 @@ async function handleVote(side) {
     try {
         // Enforce safe primitive strings mapped effectively to form encoding params
         const bodyStr = new URLSearchParams({ winner: String(winner), loser: String(loser) }).toString();
-        
+
         console.log(`Sending vote: WINNER=${winner}, LOSER=${loser}`);
 
         const response = await fetch('/', {

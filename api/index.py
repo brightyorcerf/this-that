@@ -164,30 +164,34 @@ def battle():
                 total_res = cur.fetchone()
                 total_votes = total_res['total'] if total_res and total_res['total'] else 0
                 
+                # AUTO-GENERATE NEXT PAIR
+                girl1, girl2 = generate_random_pair(cur)
+                if girl1 and girl2:
+                    cur.execute("SELECT id, filename, elo FROM girls ORDER BY elo DESC LIMIT 3")
+                    girls = cur.fetchall()
+                else:
+                    girls = []
+
+                # Finalize after local variables are captured
                 conn.commit()
+                cur.close()
+                conn.close()
+
+                if girl1 and girl2:
+                    return jsonify({
+                        "girl1": girl1,
+                        "girl2": girl2,
+                        "leaderboard": girls,
+                        "total_votes": int(total_votes)
+                    })
+                else:
+                    return jsonify({"error": "Failed to generate next pair"}), 500
+
             except Exception as e:
                 conn.rollback() # Ensure transaction closes properly to avoid locks!
                 cur.close()
                 conn.close()
                 return jsonify({"error": f"Error recording vote: {str(e)}"}), 500
-                
-            # AUTO-GENERATE NEXT PAIR
-            girl1, girl2 = generate_random_pair(cur)
-            if girl1 and girl2:
-                cur.execute("SELECT id, filename, elo FROM girls ORDER BY elo DESC LIMIT 3")
-                girls = cur.fetchall()
-                cur.close()
-                conn.close()
-                return jsonify({
-                    "girl1": girl1,
-                    "girl2": girl2,
-                    "leaderboard": girls,
-                    "total_votes": int(total_votes)
-                })
-            else:
-                cur.close()
-                conn.close()
-                return jsonify({"error": "Failed to generate next pair"}), 500
                 
         else:
             cur.close()
