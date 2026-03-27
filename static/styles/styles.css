@@ -1,10 +1,9 @@
-/* === GLOBAL STYLES === */
 body {
     background-image: url("../bg.jpg");
-    background-repeat: no-repeat;
-    background-position: center center;
+    background-repeat: repeat;
+    background-position: top center;
     background-size: cover;
-    background-attachment: fixed;
+    background-attachment: scroll;
 
     font-family: "Mona Sans", "Mona Sans Fallback", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     color: #000000;
@@ -34,15 +33,12 @@ h3 {
     margin-top: 40px;
 }
 
-/* === CONTAINER === */
 .container {
-    padding-top: 20px;
     width: 100%;
     margin: 0 auto;
     text-align: center;
 }
 
-/* === BUTTONS === */
 .btn-primary {
     color: #fff;
     background-color: #8B0200;
@@ -69,7 +65,6 @@ h3 {
     box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
 }
 
-/* === BATTLE IMAGES === */
 .choice-container {
     position: relative;
     padding: 10px;
@@ -100,7 +95,6 @@ h3 {
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
 }
 
-/* Rating text under images */
 .choice-container p {
     color: #8B0200;
     font-weight: 700;
@@ -109,9 +103,8 @@ h3 {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* === PLACEHOLDER === */
 .placeholder-box {
-    min-height: 450px;
+    min-height: 200px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,7 +142,6 @@ h3 {
     color: #ff6b6b;
 }
 
-/* === LEADERBOARD === */
 #leaderboard {
     background-color: #1a1a1a;
     border: 5px solid #777;
@@ -180,20 +172,6 @@ h3 {
     background-color: #3a3a3a;
 }
 
-#leaderboard tbody td {
-    padding: 15px;
-    color: #e0e0e0;
-    vertical-align: middle;
-    border: none;
-}
-
-#leaderboard tbody td:nth-child(2) {
-    color: #8B0200;
-    font-weight: 700;
-    font-size: 1.3rem;
-}
-
-/* Leaderboard images */
 .leaderboard-img {
     width: 100px;
     height: 100px;
@@ -208,6 +186,25 @@ h3 {
     filter: grayscale(0%);
     transform: scale(1.1);
     border-color: #8B0200;
+}
+
+#leaderboard tbody td {
+    padding: 15px;
+    color: #1a1a1a;
+    vertical-align: middle;
+    border: none;
+}
+
+#leaderboard tbody td:nth-child(1) {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+#leaderboard tbody td:nth-child(2) {
+    color: #8B0200;
+    font-weight: 700;
+    font-size: 1.3rem;
 }
 
 /* DataTables custom styling */
@@ -229,41 +226,30 @@ h3 {
 }
 
 @media (max-width: 768px) {
-    .row.mt-4 {
+    .container .row {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        align-items: center;
+        gap: 15px;
     }
 
     .choice-img {
         max-height: 25vh;
         width: 100%;
         max-width: 400px;
+        height: auto;
         margin: 0 auto;
-    }
-
-    .row {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        object-fit: contain;
+        background-color: transparent;
     }
 
     .choice-container {
-        width: 100%;
-        max-width: 450px;
-        margin-bottom: 20px;
+        padding: 5px;
+        margin-bottom: 10px;
     }
 
     h1 {
         font-size: 2rem;
-    }
-
-    .choice-img {
-        height: 300px;
-    }
-
-    .placeholder-box {
-        min-height: 300px;
     }
 
     .btn-primary {
@@ -284,10 +270,6 @@ h3 {
 }
 
 @media (max-width: 480px) {
-    .choice-img {
-        height: 250px;
-    }
-
     .leaderboard-img {
         width: 50px;
         height: 50px;
