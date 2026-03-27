@@ -131,72 +131,62 @@ def battle():
                 "leaderboard": girls,
                 "total_votes": int(total_votes)
             })
-            
-        # Standard Voting Path route
+             
         elif data.get("winner") and data.get("loser"):
-            winner_id = data.get("winner")
-            loser_id = data.get("loser")
-            
-            # Security Audit Validation: Ensure they are parseable, unique integers!
             try:
-                winner_id = int(winner_id)
-                loser_id = int(loser_id)
-            except ValueError:
-                cur.close()
-                conn.close()
-                return jsonify({"error": "Invalid vote format: IDs must be integer"}), 400
-            
-            if winner_id == loser_id or winner_id <= 0 or loser_id <= 0:
-                cur.close()
-                conn.close()
-                return jsonify({"error": "Invalid vote submission: self-votes not allowed"}), 400
+                winner_id = int(data.get("winner"))
+                loser_id = int(data.get("loser")) 
+                cur.execute("""
+                    (SELECT id, filename, elo, 'battle' as type FROM girls WHERE id IN (%s, %s))
+                    UNION ALL
+                    (SELECT id, filename, elo, 'random' as type FROM girls WHERE id >= (SELECT floor(random() * (SELECT COALESCE(MAX(id), 0) FROM girls)) + 1) ORDER BY id LIMIT 2)
+                    UNION ALL
+                    (SELECT id, filename, elo, 'leader' as type FROM girls ORDER BY elo DESC LIMIT 3);
+                """, (winner_id, loser_id))
                 
-            try:
-                # Actual_Score is strictly passed internally as 1 (winner) and 0 (loser) 
-                # resolving the strict actual_score inputs
-                updateElo(winner_id, loser_id, conn, k_factor=32, actual_score_winner=1, actual_score_loser=0)
+                raw_results = cur.fetchall()
+                 
+                battle_data = {r['id']: r['elo'] for r in raw_results if r['type'] == 'battle'}
+                next_randoms = [r for r in raw_results if r['type'] == 'random']
+                leaderboard = [r for r in raw_results if r['type'] == 'leader']
+ 
+                from .helpers import expected_score
+                w_elo = battle_data.get(winner_id, 1200)
+                l_elo = battle_data.get(loser_id, 1200)
                 
-                # 1. Update vote counts in DB
-                cur.execute("UPDATE girls SET votes = COALESCE(votes, 0) + 1 WHERE id IN (%s, %s)", (winner_id, loser_id))
+                e_w = expected_score(w_elo, l_elo)
+                e_l = expected_score(l_elo, w_elo)
                 
-                # 2. Get the Global Total
-                cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
-                total_res = cur.fetchone()
-                total_votes = total_res['total'] if total_res and total_res['total'] else 0
+                new_w = round(w_elo + 32 * (1 - e_w))
+                new_l = round(l_elo + 32 * (0 - e_l))
+ 
+                cur.execute("""
+                    UPDATE girls SET elo = CASE 
+                        WHEN id = %s THEN %s 
+                        WHEN id = %s THEN %s 
+                    END,
+                    votes = COALESCE(votes, 0) + 1 
+                    WHERE id IN (%s, %s);
+                    
+                    SELECT (SUM(votes) / 2) + 1 AS total FROM girls;
+                """, (winner_id, new_w, loser_id, new_l, winner_id, loser_id))
                 
-                # AUTO-GENERATE NEXT PAIR
-                girl1, girl2 = generate_random_pair(cur)
-                if girl1 and girl2:
-                    cur.execute("SELECT id, filename, elo FROM girls ORDER BY elo DESC LIMIT 3")
-                    girls = cur.fetchall()
-                else:
-                    girls = []
+                total_votes = cur.fetchone()['total'] or 0
 
-                # Finalize after local variables are captured
                 conn.commit()
                 cur.close()
                 conn.close()
 
-                if girl1 and girl2:
-                    return jsonify({
-                        "girl1": girl1,
-                        "girl2": girl2,
-                        "leaderboard": girls,
-                        "total_votes": int(total_votes)
-                    })
-                else:
-                    return jsonify({"error": "Failed to generate next pair"}), 500
+                return jsonify({
+                    "girl1": next_randoms[0] if len(next_randoms) > 0 else {"id":0, "filename":"err.jpg", "elo":1200},
+                    "girl2": next_randoms[1] if len(next_randoms) > 1 else next_randoms[0],
+                    "leaderboard": leaderboard,
+                    "total_votes": int(total_votes)
+                })
 
             except Exception as e:
-                conn.rollback() # Ensure transaction closes properly to avoid locks!
-                cur.close()
-                conn.close()
-                return jsonify({"error": f"Error recording vote: {str(e)}"}), 500
-                
-        else:
-            cur.close()
-            conn.close()
-            return jsonify({"error": "Invalid request parameters"}), 400
+                if conn: conn.rollback()
+                return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

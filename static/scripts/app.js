@@ -9,10 +9,20 @@ $(function () {
         });
     }
 });
-
 async function handleVote(side) {
     const battleRow = document.getElementById('battle-row');
-    battleRow.classList.add('loading-active');
+
+    const g1 = document.getElementById('girl1-img');
+    const g2 = document.getElementById('girl2-img');
+    if (!g1 || !g2) return;
+
+    const id1 = g1.getAttribute('data-id');
+    const id2 = g2.getAttribute('data-id');
+    const winner = (side === 'left') ? id1 : id2;
+    const loser = (side === 'left') ? id2 : id1;
+
+    battleRow.style.opacity = '0.5';
+    battleRow.style.pointerEvents = 'none';
 
     const countEl = document.getElementById('total-votes-count');
     if (countEl) {
@@ -20,20 +30,8 @@ async function handleVote(side) {
         countEl.innerText = currentCount + 1;
     }
 
-    const g1 = document.getElementById('girl1-img');
-    const g2 = document.getElementById('girl2-img');
-
-    const id1 = g1.getAttribute('data-id');
-    const id2 = g2.getAttribute('data-id');
-
-    const winner = (side === 'left') ? id1 : id2;
-    const loser = (side === 'left') ? id2 : id1;
-
     try {
-        // Enforce safe primitive strings mapped effectively to form encoding params
         const bodyStr = new URLSearchParams({ winner: String(winner), loser: String(loser) }).toString();
-
-        console.log(`Sending vote: WINNER=${winner}, LOSER=${loser}`);
 
         const response = await fetch('/', {
             method: 'POST',
@@ -48,15 +46,12 @@ async function handleVote(side) {
             } else {
                 updateUI(data);
             }
-        } else {
-            const errorMsg = await response.text();
-            alert("Server Error: " + errorMsg);
-            console.error("Non-200 Response:", errorMsg);
         }
     } catch (error) {
-        console.error("Failed to submit vote:", error);
-        alert("Network Error: Could not connect to server.");
+        console.error("Lag War Error:", error);
     } finally {
+        battleRow.style.opacity = '1';
+        battleRow.style.pointerEvents = 'auto';
         battleRow.classList.remove('loading-active');
     }
 }
