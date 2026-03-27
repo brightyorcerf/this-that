@@ -18,6 +18,12 @@
     {% endif %}
     {% endwith %}
 
+    <div class="mb-3">
+        <span id="vote-badge" class="badge">
+            <span id="total-votes-count">{{ total_votes | default(0) }}</span> VOTES REGISTERED SO FAR
+        </span>
+    </div>
+
     <!-- Generate button -->
     <button id="generate-btn" class="btn btn-primary btn-lg" data-max="{{ MAX_ID }}" onclick="generateNewPair()">
         Generate Random Pair

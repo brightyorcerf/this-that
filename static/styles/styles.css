@@ -296,3 +296,14 @@ h3 {
     pointer-events: none;
     cursor: wait;
 }
+
+#vote-badge {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+    border: 3px solid #7c3aed;
+    font-weight: 800;
+    padding: 8px 15px;
+    box-shadow: 4px 4px 0px rgba(124, 58, 237, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

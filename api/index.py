@@ -78,9 +78,13 @@ def battle():
             girl1 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
             girl2 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
             
+        cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
+        total_res = cur.fetchone()
+        total_votes = total_res['total'] if total_res and total_res['total'] else 0
+            
         cur.close()
         conn.close()
-        return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls)
+        return render_template("battle.html", MAX_ID=MAX_ID, girl1=girl1, girl2=girl2, girls=girls, total_votes=int(total_votes))
         
     else:  # POST request
         # Parse JSON if available, otherwise fallback to form
@@ -111,6 +115,10 @@ def battle():
             cur.execute("SELECT id, filename, elo FROM girls WHERE id = %s", (id2,))
             girl2 = cur.fetchone()
             
+            cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
+            total_res = cur.fetchone()
+            total_votes = total_res['total'] if total_res and total_res['total'] else 0
+            
             cur.close()
             conn.close()
             
@@ -120,7 +128,8 @@ def battle():
             return jsonify({
                 "girl1": girl1,
                 "girl2": girl2,
-                "leaderboard": girls
+                "leaderboard": girls,
+                "total_votes": int(total_votes)
             })
             
         # Standard Voting Path route
@@ -146,6 +155,15 @@ def battle():
                 # Actual_Score is strictly passed internally as 1 (winner) and 0 (loser) 
                 # resolving the strict actual_score inputs
                 updateElo(winner_id, loser_id, conn, k_factor=32, actual_score_winner=1, actual_score_loser=0)
+                
+                # 1. Update vote counts in DB
+                cur.execute("UPDATE girls SET votes = COALESCE(votes, 0) + 1 WHERE id IN (%s, %s)", (winner_id, loser_id))
+                
+                # 2. Get the Global Total
+                cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
+                total_res = cur.fetchone()
+                total_votes = total_res['total'] if total_res and total_res['total'] else 0
+                
                 conn.commit()
             except Exception as e:
                 conn.rollback() # Ensure transaction closes properly to avoid locks!
@@ -163,7 +181,8 @@ def battle():
                 return jsonify({
                     "girl1": girl1,
                     "girl2": girl2,
-                    "leaderboard": girls
+                    "leaderboard": girls,
+                    "total_votes": int(total_votes)
                 })
             else:
                 cur.close()

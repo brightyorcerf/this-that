@@ -14,6 +14,12 @@ async function handleVote(side) {
     const battleRow = document.getElementById('battle-row');
     battleRow.classList.add('loading-active');
 
+    const countEl = document.getElementById('total-votes-count');
+    if (countEl) {
+        let currentCount = parseInt(countEl.innerText, 10) || 0;
+        countEl.innerText = currentCount + 1;
+    }
+
     const g1 = document.getElementById('girl1-img');
     const g2 = document.getElementById('girl2-img');
 
@@ -141,6 +147,13 @@ function updateUI(data) {
 
     if (leaderboard) {
         updateLeaderboard(leaderboard);
+    }
+
+    if (data.total_votes !== undefined) {
+        const countEl = document.getElementById('total-votes-count');
+        if (countEl) {
+            countEl.innerText = data.total_votes;
+        }
     }
 }
 
