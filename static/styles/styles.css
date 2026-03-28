@@ -258,6 +258,9 @@ h3 {
 /* =============================================
    MOBILE — 768px and below
    ============================================= */
+/* =============================================
+   MOBILE — 768px and below
+   ============================================= */
 @media (max-width: 768px) {
 
     /* --- Typography --- */
@@ -285,7 +288,7 @@ h3 {
         margin: 0;
     }
 
-    /* --- Choice cards: fixed-aspect image frame so all sizes look uniform --- */
+    /* --- Choice cards: FIXED SIZING LOGIC --- */
     .choice-container {
         padding: 8px 4px;
         margin-bottom: 4px;
@@ -293,7 +296,11 @@ h3 {
 
     .choice-img-wrapper {
         width: 100%;
-        aspect-ratio: 4 / 3;
+        /* FIXED BOX: Square ratio prevents vertical bloat */
+        aspect-ratio: 1 / 1;
+        /* SAFETY CAP: Box will never exceed 32% of screen height */
+        max-height: 32vh;
+
         background-color: #1a1a1a;
         border: 4px solid #777;
         box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.7);
@@ -310,10 +317,10 @@ h3 {
     }
 
     .choice-img {
-        /* Reset desktop constraints; fill the wrapper instead */
         width: 100%;
         height: 100%;
         max-height: none;
+        /* ZOOM LOGIC: Fills the fixed box without stretching */
         object-fit: cover;
         object-position: center;
         border: none;
@@ -331,7 +338,8 @@ h3 {
     }
 
     .choice-img:active {
-        transform: scale(0.98);
+        transform: scale(1.1);
+        /* Interactive zoom when clicked */
         box-shadow: none;
     }
 
@@ -422,7 +430,9 @@ h3 {
     }
 
     .choice-img-wrapper {
-        aspect-ratio: 3 / 2;
+        /* Tighter aspect ratio and max-height for tiny screens */
+        aspect-ratio: 1 / 1;
+        max-height: 28vh;
         border-width: 3px;
     }
 
