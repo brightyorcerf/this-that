@@ -78,9 +78,9 @@ def battle():
             girl1 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
             girl2 = {"id": 0, "filename": "placeholder.jpg", "elo": 0}
             
-        cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
+        cur.execute("SELECT total_votes FROM metadata WHERE id = 1")
         total_res = cur.fetchone()
-        total_votes = total_res['total'] if total_res and total_res['total'] else 0
+        total_votes = total_res['total_votes'] if total_res and total_res['total_votes'] else 0
             
         cur.close()
         conn.close()
@@ -115,9 +115,9 @@ def battle():
             cur.execute("SELECT id, filename, elo FROM girls WHERE id = %s", (id2,))
             girl2 = cur.fetchone()
             
-            cur.execute("SELECT SUM(votes) / 2 AS total FROM girls")
+            cur.execute("SELECT total_votes FROM metadata WHERE id = 1")
             total_res = cur.fetchone()
-            total_votes = total_res['total'] if total_res and total_res['total'] else 0
+            total_votes = total_res['total_votes'] if total_res and total_res['total_votes'] else 0
             
             cur.close()
             conn.close()
@@ -168,10 +168,10 @@ def battle():
                     votes = COALESCE(votes, 0) + 1 
                     WHERE id IN (%s, %s);
                     
-                    SELECT (SUM(votes) / 2) + 1 AS total FROM girls;
+                    UPDATE metadata SET total_votes = total_votes + 1 WHERE id = 1 RETURNING total_votes;
                 """, (winner_id, new_w, loser_id, new_l, winner_id, loser_id))
                 
-                total_votes = cur.fetchone()['total'] or 0
+                total_votes = cur.fetchone()['total_votes'] or 0
 
                 conn.commit()
                 cur.close()
