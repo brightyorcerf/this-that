@@ -12,7 +12,6 @@ body {
     min-height: 100vh;
 }
 
-
 h1,
 h2,
 h3 {
@@ -225,57 +224,6 @@ h3 {
     color: #999;
 }
 
-@media (max-width: 768px) {
-    .container .row {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .choice-img {
-        max-height: 25vh;
-        width: 100%;
-        max-width: 400px;
-        height: auto;
-        margin: 0 auto;
-        object-fit: contain;
-        background-color: #FFFFFF;
-    }
-
-    .choice-container {
-        padding: 5px;
-        margin-bottom: 10px;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    .btn-primary {
-        padding: 12px 30px;
-        font-size: 1rem;
-    }
-
-    .leaderboard-img {
-        width: 70px;
-        height: 70px;
-    }
-
-    #leaderboard thead th,
-    #leaderboard tbody td {
-        padding: 10px 5px;
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .leaderboard-img {
-        width: 50px;
-        height: 50px;
-    }
-}
-
 #colorCorrect {
     color: #1a202c;
     font-weight: 700;
@@ -305,4 +253,195 @@ h3 {
     box-shadow: 4px 4px 0px rgba(124, 58, 237, 0.3);
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+/* =============================================
+   MOBILE — 768px and below
+   ============================================= */
+@media (max-width: 768px) {
+
+    /* --- Typography --- */
+    h1 {
+        font-size: 1.6rem;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        margin-top: 24px;
+    }
+
+    /* --- Layout --- */
+    .container {
+        padding: 0 12px;
+    }
+
+    .container .row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin: 0;
+    }
+
+    /* --- Choice cards: fixed-aspect image frame so all sizes look uniform --- */
+    .choice-container {
+        padding: 8px 4px;
+        margin-bottom: 4px;
+    }
+
+    .choice-img-wrapper {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        background-color: #1a1a1a;
+        border: 4px solid #777;
+        box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.7);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .choice-img-wrapper:active {
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
+        transform: translate(2px, 2px);
+    }
+
+    .choice-img {
+        /* Reset desktop constraints; fill the wrapper instead */
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        object-fit: cover;
+        object-position: center;
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+        filter: grayscale(10%) contrast(110%);
+        transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .choice-img:hover,
+    .choice-img:focus {
+        transform: scale(1.04);
+        filter: grayscale(0%) contrast(120%) brightness(105%);
+        box-shadow: none;
+    }
+
+    .choice-img:active {
+        transform: scale(0.98);
+        box-shadow: none;
+    }
+
+    .choice-container p {
+        font-size: 0.85rem;
+        margin-top: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- Placeholder --- */
+    .placeholder-box {
+        min-height: 140px !important;
+        margin: 6px 4px;
+        border-width: 3px;
+    }
+
+    .placeholder-box p {
+        font-size: 1rem;
+    }
+
+    /* --- Button --- */
+    .btn-primary {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-primary:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+    }
+
+    /* --- Alerts --- */
+    .alert {
+        margin: 12px 4px;
+        font-size: 0.9rem;
+        padding: 10px 14px;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    /* --- Leaderboard --- */
+    #leaderboard {
+        border-width: 3px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.7);
+        margin-bottom: 30px;
+        font-size: 0.82rem;
+    }
+
+    #leaderboard thead th {
+        padding: 10px 6px;
+        font-size: 0.78rem;
+        letter-spacing: 0.5px;
+    }
+
+    #leaderboard tbody td {
+        padding: 10px 6px;
+        vertical-align: middle;
+    }
+
+    #leaderboard tbody td:nth-child(2) {
+        font-size: 1rem;
+    }
+
+    .leaderboard-img {
+        width: 52px;
+        height: 52px;
+        border-width: 2px;
+    }
+
+    /* --- Vote badge --- */
+    #vote-badge {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        letter-spacing: 0.5px;
+        box-shadow: 2px 2px 0px rgba(124, 58, 237, 0.3);
+    }
+}
+
+/* =============================================
+   SMALL PHONES — 480px and below
+   ============================================= */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .choice-img-wrapper {
+        aspect-ratio: 3 / 2;
+        border-width: 3px;
+    }
+
+    .leaderboard-img {
+        width: 38px;
+        height: 38px;
+    }
+
+    #leaderboard {
+        font-size: 0.75rem;
+    }
+
+    #leaderboard thead th,
+    #leaderboard tbody td {
+        padding: 7px 4px;
+    }
+
+    .btn-primary {
+        font-size: 0.9rem;
+        padding: 12px 16px;
+    }
 }
