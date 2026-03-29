@@ -1,6 +1,6 @@
 import psycopg2
 import os
- 
+
 RAW_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.mtbsgadocmnhjxxdnmdj:Ei4IvmIAjsU5lXra@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres")
 DATABASE_URL = RAW_URL if "?" in RAW_URL else f"{RAW_URL}?sslmode=require"
 
@@ -10,7 +10,7 @@ def seed_to_supabase():
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
-         
+        
         cur.execute("""
             CREATE TABLE IF NOT EXISTS girls (
                 id SERIAL PRIMARY KEY,
@@ -18,23 +18,25 @@ def seed_to_supabase():
                 elo INTEGER NOT NULL DEFAULT 1500
             );
         """)
+
+        images = [f for f in os.listdir(IMAGE_DIR) if f.lower().endswith('.webp')]
+        print(f"📂 Found {len(images)} local images. Checking database...")
  
-        print("🧹 Wiping old database entries for a clean reseed...")
-        cur.execute("TRUNCATE TABLE girls RESTART IDENTITY;")
-          
-        images = [f for f in os.listdir(IMAGE_DIR) 
-                  if f.lower().endswith('.webp')]
+        cur.execute("SELECT filename FROM girls;")
+        existing = {row[0] for row in cur.fetchall()}
         
-        print(f"📂 Found {len(images)} compressed images. Uploading...")
- 
+        new_count = 0
         for img in images: 
-            cur.execute(
-                "INSERT INTO girls (filename, elo) VALUES (%s, %s)",
-                (img, 1500) 
-            )
+            if img not in existing:
+                cur.execute(
+                    "INSERT INTO girls (filename, elo) VALUES (%s, %s)",
+                    (img, 1500) 
+                )
+                print(f"➕ Added new: {img}")
+                new_count += 1
             
         conn.commit()
-        print(f"✅ Successfully synced {len(images)} images to Supabase!")
+        print(f"✅ Sync complete! Added {new_count} new images. {len(existing)} veterans remain untouched.")
         
     except Exception as e:
         print(f"❌ Error: {e}")
